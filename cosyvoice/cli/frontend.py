@@ -22,10 +22,11 @@ import whisper
 from typing import Callable
 from torchaudio.compliance import kaldi
 from torchaudio.transforms import Resample
+from torchaudio.compliance import kaldi
+from torchaudio.transforms import Resample
 import os
 import re
 from inflect import engine
-import logging
 try:
     import ttsfrd
     use_ttsfrd = True

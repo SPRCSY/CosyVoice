@@ -18,7 +18,8 @@ import argparse
 import logging
 logging.getLogger('matplotlib').setLevel(logging.WARNING)
 import os
-from torch import cuda,no_grad,concat
+from torch import no_grad,concat
+from torch.cuda import is_available as cuda_is_available
 from torch.utils.data import DataLoader
 import torchaudio
 from hyperpyyaml import load_hyperpyyaml
@@ -57,7 +58,7 @@ def main():
     os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
 
     # Init cosyvoice models from configs
-    use_cuda = args.gpu >= 0 and cuda.is_available()
+    use_cuda = args.gpu >= 0 and cuda_is_available()
     device = device('cuda' if use_cuda else 'cpu')
     with open(args.config, 'r') as f:
         configs = load_hyperpyyaml(f)

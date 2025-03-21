@@ -13,7 +13,8 @@
 # limitations under the License.
 import os
 from typing import Generator
-from torch import nn,device,cuda,concat,tensor,zeros,load,jit,int32
+from torch import device,cuda,concat,tensor,zeros,load,jit,int32
+from torch.nn import Module as nnModule
 import numpy as np
 import threading
 import time
@@ -27,9 +28,9 @@ from cosyvoice.utils.file_utils import convert_onnx_to_trt
 class CosyVoiceModel:
 
     def __init__(self,
-                 llm: nn.Module,
-                 flow: nn.Module,
-                 hift: nn.Module,
+                 llm: nnModule,
+                 flow: nnModule,
+                 hift: nnModule,
                  fp16: bool):
         self.device = device('cuda' if cuda.is_available() else 'cpu')
         self.llm = llm
@@ -154,7 +155,7 @@ class CosyVoiceModel:
         else:
             if speed != 1.0:
                 assert self.hift_cache_dict[uuid] is None, 'speed change only support non-stream inference mode'
-                tts_mel = nn.functional.interpolate(tts_mel, size=int(tts_mel.shape[2] / speed), mode='linear')
+                tts_mel = F.interpolate(tts_mel, size=int(tts_mel.shape[2] / speed), mode='linear')
             tts_speech, tts_source = self.hift.inference(speech_feat=tts_mel, cache_source=hift_cache_source)
             if self.hift_cache_dict[uuid] is not None:
                 tts_speech = fade_in_out(tts_speech, self.hift_cache_dict[uuid]['speech'], self.speech_window)
@@ -282,9 +283,9 @@ class CosyVoiceModel:
 class CosyVoice2Model(CosyVoiceModel):
 
     def __init__(self,
-                 llm: nn.Module,
-                 flow: nn.Module,
-                 hift: nn.Module,
+                 llm: nnModule,
+                 flow: nnModule,
+                 hift: nnModule,
                  fp16: bool):
         self.device = device('cuda' if cuda.is_available() else 'cpu')
         self.llm = llm
@@ -346,7 +347,7 @@ class CosyVoice2Model(CosyVoiceModel):
         else:
             if speed != 1.0:
                 assert self.hift_cache_dict[uuid] is None, 'speed change only support non-stream inference mode'
-                tts_mel = nn.functional.interpolate(tts_mel, size=int(tts_mel.shape[2] / speed), mode='linear')
+                tts_mel = F.interpolate(tts_mel, size=int(tts_mel.shape[2] / speed), mode='linear')
             tts_speech, tts_source = self.hift.inference(speech_feat=tts_mel, cache_source=hift_cache_source)
             if self.hift_cache_dict[uuid] is not None:
                 tts_speech = fade_in_out(tts_speech, self.hift_cache_dict[uuid]['speech'], self.speech_window)
